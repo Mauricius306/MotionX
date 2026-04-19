@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <meta name="theme-color" content="#0a0a0a" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Basecamp" />
+  <meta name="mobile-web-app-capable" content="yes" />
+
+  <title>Basecamp</title>
+
+  <link rel="manifest" href="manifest.json" />
+  <link rel="apple-touch-icon" href="icons/icon-192.png" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    html, body, #root {
+      height: 100%;
+      margin: 0;
+      background: #0a0a0a;
+      overscroll-behavior: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      color: #fafafa;
+    }
+    html { overscroll-behavior-y: contain; }
+    #loading {
+      position: fixed; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: #0a0a0a;
+      color: #737373;
+      font-family: system-ui, sans-serif;
+      letter-spacing: 0.3em;
+      text-transform: uppercase;
+      font-size: 12px;
+    }
+    #error {
+      position: fixed; inset: 0;
+      display: none; flex-direction: column; gap: 1rem; align-items: center; justify-content: center;
+      background: #0a0a0a;
+      color: #f87171;
+      font-family: monospace;
+      padding: 2rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div id="loading">Basecamp</div>
+  </div>
+  <div id="error"></div>
+
+  <!-- 1. React + ReactDOM (production builds) -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+  <!-- 2. Lucide icons (vanilla) -->
+  <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+
+  <!-- 3. Babel Standalone for JSX at runtime -->
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+  <!-- 4. Storage adapter: window.storage.* -> IndexedDB -->
+  <script>
+    (function() {
+      const DB_NAME = 'basecamp';
+      const STORE = 'kv';
+      let dbPromise;
+      function openDB() {
+        if (dbPromise) return dbPromise;
+        dbPromise = new Promise((resolve, reject) => {
+          const req = indexedDB.open(DB_NAME, 1);
+          req.onupgradeneeded = () => req.result.createObjectStore(STORE);
+          req.onsuccess = () => resolve(req.result);
+          req.onerror = () => reject(req.error);
+        });
+        return dbPromise;
+      }
+      async function tx(mode) {
+        const db = await openDB();
+        return db.transaction(STORE, mode).objectStore(STORE);
+      }
+      window.storage = {
+        async get(key) {
+          const store = await tx('readonly');
+          return new Promise((resolve, reject) => {
+            const req = store.get(key);
+            req.onsuccess = () => resolve(req.result != null ? { key, value: req.result } : null);
+            req.onerror = () => reject(req.error);
+          });
+        },
+        async set(key, value) {
+          const store = await tx('readwrite');
+          return new Promise((resolve, reject) => {
+            const req = store.put(value, key);
+            req.onsuccess = () => resolve({ key, value });
+            req.onerror = () => reject(req.error);
+          });
+        },
+        async delete(key) {
+          const store = await tx('readwrite');
+          return new Promise((resolve, reject) => {
+            const req = store.delete(key);
+            req.onsuccess = () => resolve({ key, deleted: true });
+            req.onerror = () => reject(req.error);
+          });
+        },
+        async list(prefix) {
+          const store = await tx('readonly');
+          return new Promise((resolve, reject) => {
+            const keys = [];
+            const req = store.openKeyCursor();
+            req.onsuccess = () => {
+              const cursor = req.result;
+              if (cursor) {
+                if (!prefix || String(cursor.key).startsWith(prefix)) keys.push(cursor.key);
+                cursor.continue();
+              } else { resolve({ keys }); }
+            };
+            req.onerror = () => reject(req.error);
+          });
+        }
+      };
+    })();
+  </script>
+
+  <!-- 5. Lucide -> React adapter -->
+  <script src="lucide-adapter.js"></script>
+
+  <!-- 6. Error display -->
+  <script>
+    window.__showError = function(msg) {
+      const el = document.getElementById('error');
+      el.style.display = 'flex';
+      el.innerHTML = '<div>BASECAMP konnte nicht starten</div><div style="opacity:0.7; max-width:500px; word-break:break-word; font-size:11px;">' + msg + '</div>';
+      const loading = document.getElementById('loading');
+      if (loading) loading.style.display = 'none';
+    };
+    window.addEventListener('error', (e) => {
+      if (e.message) {
+        window.__showError(e.message);
+      }
+    });
+  </script>
+
+  <!-- 7. The app (JSX, compiled at runtime by Babel) -->
+  <script type="text/babel" data-presets="react" src="basecamp.jsx"></script>
+
+  <!-- 8. Bootstrap -->
+  <script>
+    (function waitAndMount(tries) {
+      tries = tries || 0;
+      if (window.__BasecampApp && window.__LucideReactReady) {
+        try {
+          const root = ReactDOM.createRoot(document.getElementById('root'));
+          root.render(React.createElement(window.__BasecampApp));
+        } catch (e) {
+          window.__showError(String(e));
+        }
+      } else if (tries < 300) {
+        setTimeout(() => waitAndMount(tries + 1), 50);
+      } else {
+        window.__showError('Timeout beim Laden. Internet aktiv? Seite neu laden.');
+      }
+    })();
+  </script>
+
+  <!-- 9. Service Worker for offline -->
+  <script>
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').catch(() => {});
+      });
+    }
+  </script>
+</body>
+</html>
