@@ -2,7 +2,7 @@
 // Strategy: Cache app shell + CDN resources on install. Network-first for app files,
 // cache-first for CDN assets.
 
-const CACHE = 'basecamp-v1';
+const CACHE = 'basecamp-v2';
 
 const APP_SHELL = [
   './',

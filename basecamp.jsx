@@ -420,7 +420,10 @@ function App() {
   }
 
   return (
-    <div className="fixed inset-0 bg-neutral-950 text-neutral-50 overflow-hidden flex flex-col">
+    <div
+      className="fixed inset-0 bg-neutral-950 text-neutral-50 overflow-hidden flex flex-col"
+      style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
         .font-display { font-family: 'Barlow Condensed', system-ui, sans-serif; letter-spacing: 0.02em; }
@@ -1370,7 +1373,7 @@ function WorkoutBuilder({ data, save, workoutId, onClose }) {
   return (
     <Modal onClose={onClose}>
       <div className="flex items-center justify-between p-4 border-b border-neutral-800">
-        <button onClick={onClose} className="text-neutral-400"><X size={22} /></button>
+        <button onClick={onClose} className="text-neutral-400 p-2 -m-2" aria-label="Schließen"><X size={24} /></button>
         <div className="font-display uppercase text-xs tracking-widest font-bold">
           {workoutId ? 'Vorlage bearbeiten' : 'Neues Workout'}
         </div>
@@ -1576,7 +1579,7 @@ function ExercisePicker({ data, save, onPick, onClose }) {
   return (
     <Modal onClose={onClose}>
       <div className="flex items-center justify-between p-4 border-b border-neutral-800">
-        <button onClick={onClose} className="text-neutral-400"><X size={22} /></button>
+        <button onClick={onClose} className="text-neutral-400 p-2 -m-2" aria-label="Schließen"><X size={24} /></button>
         <div className="font-display uppercase text-xs tracking-widest font-bold">Übung wählen</div>
         <button onClick={() => setShowAdd(true)} className="text-orange-500 font-display uppercase text-xs tracking-widest font-bold flex items-center gap-1">
           <Plus size={14} strokeWidth={3} /> Neu
@@ -1676,7 +1679,7 @@ function AssignDayModal({ data, save, day, onClose }) {
   return (
     <Modal onClose={onClose}>
       <div className="flex items-center justify-between p-4 border-b border-neutral-800">
-        <button onClick={onClose} className="text-neutral-400"><X size={22} /></button>
+        <button onClick={onClose} className="text-neutral-400 p-2 -m-2" aria-label="Schließen"><X size={24} /></button>
         <div className="font-display uppercase text-xs tracking-widest font-bold">{dayLabel}</div>
         <div className="w-6" />
       </div>
@@ -1852,10 +1855,13 @@ function SessionPlayer({ session, data, save, onClose, onUpdate }) {
   };
 
   return (
-    <div className="fixed inset-0 bg-neutral-950 z-40 flex flex-col">
+    <div
+      className="fixed inset-0 bg-neutral-950 z-40 flex flex-col"
+      style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       {/* Header */}
       <div className="border-b border-neutral-800 p-4 flex items-center gap-3">
-        <button onClick={cancelSession} className="text-neutral-500"><X size={22} /></button>
+        <button onClick={cancelSession} className="text-neutral-500 p-2 -m-2"><X size={24} /></button>
         <div className="flex-1">
           <div className="font-display uppercase text-sm font-bold tracking-wide truncate">{session.name}</div>
           <div className="font-mono text-[10px] text-neutral-500 flex items-center gap-2">
@@ -2171,7 +2177,7 @@ function ExerciseHistoryModal({ exerciseId, data, onClose }) {
         <div className="p-5 pb-3 border-b border-neutral-800">
           <div className="flex items-center justify-between mb-2">
             {def && <TypeBadge type={def.type} />}
-            <button onClick={onClose} className="text-neutral-500 p-1"><X size={20} /></button>
+            <button onClick={onClose} className="text-neutral-500 p-2 -m-1" aria-label="Schließen"><X size={22} /></button>
           </div>
           <h2 className="font-display text-2xl font-bold uppercase tracking-tight leading-tight">{def?.name || 'Übung'}</h2>
           <div className="text-neutral-500 font-mono text-xs mt-1">
@@ -2266,7 +2272,7 @@ function QuickLogger({ data, save, workoutId, onClose }) {
   return (
     <Modal onClose={onClose}>
       <div className="flex items-center justify-between p-4 border-b border-neutral-800">
-        <button onClick={onClose} className="text-neutral-400"><X size={22} /></button>
+        <button onClick={onClose} className="text-neutral-400 p-2 -m-2" aria-label="Schließen"><X size={24} /></button>
         <div className="font-display uppercase text-xs tracking-widest font-bold">Schnell loggen</div>
         <button onClick={saveLog} className="text-orange-500 font-display uppercase text-xs tracking-widest font-bold">Speichern</button>
       </div>
@@ -2497,7 +2503,7 @@ function SessionStartModal({ workout, data, onStart, onClose }) {
         <div className="p-5 pb-3">
           <div className="flex items-center justify-between mb-3">
             <TypeBadge type={workout.type} />
-            <button onClick={onClose} className="text-neutral-500 p-1"><X size={20} /></button>
+            <button onClick={onClose} className="text-neutral-500 p-2 -m-1" aria-label="Schließen"><X size={22} /></button>
           </div>
           <h2 className="font-display text-2xl font-bold uppercase tracking-tight leading-tight">{workout.name}</h2>
           <div className="text-neutral-500 font-mono text-xs mt-1">
@@ -2662,7 +2668,7 @@ function BodyWeightModal({ data, save, onClose }) {
             <Scale size={18} className="text-sky-400" />
             <h2 className="font-display text-xl font-bold uppercase tracking-tight">Körpergewicht</h2>
           </div>
-          <button onClick={onClose} className="text-neutral-500 p-1"><X size={20} /></button>
+          <button onClick={onClose} className="text-neutral-500 p-2 -m-1" aria-label="Schließen"><X size={22} /></button>
         </div>
 
         <div className="p-5 border-b border-neutral-800">
@@ -2739,7 +2745,7 @@ function OneRMModal({ onClose }) {
             <Calculator size={18} className="text-orange-500" />
             <h2 className="font-display text-xl font-bold uppercase tracking-tight">1RM-Rechner</h2>
           </div>
-          <button onClick={onClose} className="text-neutral-500 p-1"><X size={20} /></button>
+          <button onClick={onClose} className="text-neutral-500 p-2 -m-1" aria-label="Schließen"><X size={22} /></button>
         </div>
 
         <div className="p-5 space-y-4">
@@ -2823,7 +2829,7 @@ function PlateCalcModal({ onClose }) {
             <Dumbbell size={18} className="text-yellow-400" />
             <h2 className="font-display text-xl font-bold uppercase tracking-tight">Plate-Calculator</h2>
           </div>
-          <button onClick={onClose} className="text-neutral-500 p-1"><X size={20} /></button>
+          <button onClick={onClose} className="text-neutral-500 p-2 -m-1" aria-label="Schließen"><X size={22} /></button>
         </div>
 
         <div className="p-5 space-y-4">
@@ -2933,7 +2939,10 @@ function Onboarding({ onComplete }) {
   const canContinue = name.trim().length > 0;
 
   return (
-    <div className="fixed inset-0 bg-neutral-950 text-neutral-50 flex flex-col">
+    <div
+      className="fixed inset-0 bg-neutral-950 text-neutral-50 flex flex-col"
+      style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=JetBrains+Mono:wght@400;500;700&display=swap');
         .font-display { font-family: 'Barlow Condensed', system-ui, sans-serif; letter-spacing: 0.02em; }
@@ -3041,7 +3050,10 @@ function Onboarding({ onComplete }) {
 // =====================
 function Modal({ children, onClose }) {
   return (
-    <div className="fixed inset-0 bg-neutral-950 z-40 flex flex-col">
+    <div
+      className="fixed inset-0 bg-neutral-950 z-40 flex flex-col"
+      style={{ paddingTop: 'env(safe-area-inset-top)', paddingBottom: 'env(safe-area-inset-bottom)' }}
+    >
       {children}
     </div>
   );
